@@ -37,6 +37,11 @@ def Download():
     bs = BeautifulSoup(markup=data, features="html.parser")
     tags = bs.find("div", {"class": "gm"})
     pagelist = bs.find_all("div", {"class": "gtb"})
+    print(f"Pagelist encontrado: {len(pagelist)}")
+    if pagelist:
+        print(pagelist[0].prettify())
+    else:
+        print("❌ No se encontró 'div.gtb'")
 
     pages = []
     ###
@@ -109,10 +114,17 @@ def Download():
                     print(data)
 
             htmlpage = BeautifulSoup(markup=data, features="html.parser")
-            imagebox = htmlpage.find_all("div", {"class": "gdtm"})
-              
-            for pic in imagebox:
-                pages_links.append(pic.find("a")["href"])
+            imagebox = htmlpage.select("div#gdt a")
+            print(f"Imagenes encontradas en esta página: {len(imagebox)}")
+            for a in imagebox:
+                pages_links.append(a["href"])
+
+            # imagebox = htmlpage.find_all("div", {"class": "gdtm"})
+            # print(f"Imagenes encontradas en esta página: {len(imagebox)}")
+
+             
+            # for pic in imagebox:
+            #     pages_links.append(pic.find("a")["href"])
 
         print(
             "\n===============================\nPages: "
@@ -151,14 +163,19 @@ def Download():
 
     except KeyboardInterrupt:
         if p:
-            p.terminate()
-        exit("closeing")
+            try:
+                p.terminate()
+                exit("closeing")
+            except:    
+                exit("closeing")
 
     except Exception as e:
-        p.terminate()
-        print(e)
-        exit("closeing")
-
+        try:
+            p.terminate()
+            print(e)
+            exit("closeing")
+        except:
+            exit("closeing")
     print("Recheck...                           ")
 
     for i in FinalPageLinks:

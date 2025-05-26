@@ -238,45 +238,22 @@ Created by github.com/tank-sman/e-hentai-downloader.
             file.close()
 
 
+
+import re
 def checkIMGlimit():
     home = downloadPage("https://e-hentai.org/home.php")
-    # print("image limit check")
     bs = BeautifulSoup(home, "html.parser")
-    
-    try:
-        limit = bs.find("strong").contents[0]
-    except:
-        return "None"
-    as_str = limit + f"/5000"
-    while int(limit) >= 4950:
-        bs = BeautifulSoup(home, "html.parser")
-        try:
-            limit = bs.find("strong").contents[0]
-        except:
-            return "None"
-        as_str = limit + f"/5000"
-        limittext = (
-            as_str
-            + f" image limit. you {Fore.RED}can't{Fore.WHITE} download more images "
-        )
-        print()
-        print(
-            limittext
-            + (get_terminal_size().columns - len(limittext) - 8) * " "
-            + ctime()[11:-5],
-            end="\r",
-        )
-        sleep(120)
-        home = downloadPage("https://e-hentai.org/home.php")
-        bs = BeautifulSoup(home, "html.parser")
-        try:
-            limit = bs.find("strong").contents[0]
-        except:
-            return "Error on login"
+    text = bs.get_text()
 
-    return str(as_str)
-    # return "None"
+    # Frase que indica que todo está bien
+    ok_phrase = "No restrictions are currently in effect."
 
+    if ok_phrase in text:
+        print("✅ No hay restricciones activas. Descarga permitida.")
+        return "No restrictions"
+    else:
+        print("❌ Se detectaron restricciones de descarga. Abortando.")
+        exit("Restricción activa: límite de imágenes o calidad.")
 
 def parse_ranges(ranges: str, pages_links: list = []):
     """
